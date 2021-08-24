@@ -183,7 +183,7 @@ In order to insert a new API key to be used by a KLara worker, a new row needs t
 
 ```
 mysql > use klara;
-mysql > INSERT INTO agents value ("","description here", "API auth code here");
+mysql > INSERT INTO agents value ("", "KLara worker description here", "API auth code here");
 ```
 
 ## Installing the Worker agent
@@ -299,7 +299,7 @@ sudo supervisorctl start klara_worker
 
 Install the required dependencies:
 ```
-sudo apt -y install libtool automake libjansson-dev libmagic-dev libssl-dev build-essential
+sudo apt -y install libtool automake libjansson-dev libmagic-dev libssl-dev build-essential pkg-config
 
 #
 # Get the latest stable version of yara from https://github.com/virustotal/yara/releases
@@ -383,6 +383,17 @@ Requirements for installing web interface are:
 ```
 apt install php7.0-fpm php7.0 php7.0-mysqli php7.0-curl php7.0-gd php7.0-intl php-pear php-imagick php7.0-imap php7.0-mcrypt php-memcache  php7.0-pspell php7.0-recode php7.0-sqlite3 php7.0-tidy php7.0-xmlrpc php7.0-xsl php7.0-mbstring php-gettext php-apcu
 ```
+
+Working stuff:
+
+apt install php php-{fpm,mysqli,curl,gd,intl,pear,imagick,imap,memcache,pspell,sqlite3,tidy,xmlrpc,xsl,mbstring,apcu}
+
+
+
+
+
+
+
 
 Once you have this installed, copy `/web/` folder to the HTTP server document root. Update and rename the following sample files:
 
