@@ -44,9 +44,12 @@ def yara_scan(scan_options):
     yara_rules_save_error = False
     try:
         # Generate a temporary file name
-        yara_rules_temp_file = tempfile.NamedTemporaryFile(delete=False,
-                                                           prefix="yara_rules_",
-                                                           dir=config.yara_temp_dir)
+        yara_rules_temp_file = tempfile.NamedTemporaryFile(
+            mode="w",
+            delete=False,
+            prefix="yara_rules_",
+            dir=config.yara_temp_dir
+        )
         # Getting the 2 temp files' FN
         yara_rules_temp_file_fn = os.path.abspath(yara_rules_temp_file.name)
         # After we write the rules, we close the file so we prepare it for the
@@ -132,7 +135,8 @@ def yara_scan(scan_options):
     # Setting up the results dict
     results['finish_time'] = time.strftime('%Y-%m-%d %H:%M:%S')
     results['execution_time'] = time_end - time_start
-    results['yara_results'] = stdout_data
+    # We decode Yara's output to UTF8
+    results['yara_results'] = stdout_data.decode("utf-8")
     if return_code != 0:
         results['yara_errors'] = "Yara agent returned non-zero status code"
 
