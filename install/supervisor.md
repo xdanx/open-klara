@@ -55,3 +55,10 @@ autorestart=true
 stdout_logfile=/var/projects/klara/logs/worker3.log
 stderr_logfile=/var/projects/klara/logs/worker3.err
 ```
+
+# Updating Supervisor
+
+````
+sudo supervisorctl update
+sudo supervisorctl start all
+```
