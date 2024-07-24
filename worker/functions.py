@@ -104,7 +104,7 @@ def yara_scan(scan_options):
 
     # If yara didn't return 0, then we have an error!
     if return_code != 0:
-        results['yara_errors'] = stderr_data
+        results['yara_errors'] = stderr_data.decode("utf-8")
         # Close the files!
         null_file.close()
         # Deleting temp files
@@ -114,11 +114,11 @@ def yara_scan(scan_options):
     # Return code was indeed 0, BUT there might be warnings returned by Yara.
     # We then save the stderr_data
     if len(stderr_data) != 0:
-        results['yara_warnings'] = stderr_data
+        results['yara_warnings'] = stderr_data.decode("utf-8")
 
     # Great, no errors!
     # 2) Doing the actual scan
-    yara_args = shlex.split(yara_cmd + str(fileset_scan))
+    yara_args = shlex.split(yara_cmd + '"' + str(fileset_scan) + '"')
     time_start = int(time.time())
     # We redirect stderr to null
     yara_process = subprocess.Popen(
@@ -183,7 +183,7 @@ def generate_md5_from_results(yara_matched_files):
     # Prepare to run md5sum as Popen
     p = subprocess.Popen([config.md5sum_path] + yara_matched_files,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    stdout_data = p.communicate()[0]
+    stdout_data = p.communicate()[0].decode('utf-8')
     # We want unique md5s
     return json.dumps(list(set(re.findall(
         pattern_for_md5sum_results, stdout_data

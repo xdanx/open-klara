@@ -60,8 +60,9 @@ if __name__ == "__main__":
             available_jobs = json.loads(dispatcher_answer['return_data'])
             our_virus_collection = config.virus_collection.rstrip("/")
             for entry in available_jobs:
+                dir_sep = "/" if entry['fileset_scan'][0] != '/' else ""
                 potential_scan_path = available_job_fileset_scan = our_virus_collection + \
-                    entry['fileset_scan']
+                    dir_sep + entry['fileset_scan']
                 # If we indeed have this directory, then we want this job!
                 # We check the existence of the folder by checking if the repository_control_file exists
                 try:
