@@ -68,8 +68,8 @@ $(document).ready(function()
         });
     });
 
-    // Delete job user click
-    $("button[type = 'delete_job']").on("click", function (event)
+    // Delete job user click - using event delegation to work with DataTables pagination
+    $(document).on("click", "button[type = 'delete_job']", function (event)
     {
         // Get the job ID
         var job_id              = $(this).attr('job_id');
@@ -86,8 +86,8 @@ $(document).ready(function()
         // And off we go...
     });
 
-    // Restart job user click
-    $("form[type = 'form_restart_job'").on('submit', function (event)
+    // Restart job user click - using event delegation to work with DataTables pagination
+    $(document).on('submit', "form[type = 'form_restart_job']", function (event)
     {
         event.preventDefault();
         // Let's get the children select
