@@ -1,4 +1,3 @@
-torndb
 requests
 tornado
-mysql-python
+pymysql

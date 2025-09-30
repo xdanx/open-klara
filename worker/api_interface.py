@@ -4,7 +4,8 @@ import requests
 import json
 
 # Ask dispatcher to send the current available jobs
-# Will return an API response (status, status_msg, return_data (if status == ok)) already
+# Will return an API response
+#  (status, status_msg, return_data (if status == ok)) already
 # parsed from json into a dict
 
 
@@ -21,9 +22,11 @@ def fetch_available_jobs():
     # Not being able to connect (Requests exception) or json decodification
     except Exception as e:
         logging.error("Exception: " + str(e))
-        return json.loads('{"status": "error", "status_msg": "connection_error"}')
+        return json.loads(
+            '{"status": "error", "status_msg": "connection_error"}'
+        )
 
-# After fetching the available jobs, ask dispatcher to assign us one job
+    # After fetching the available jobs, ask dispatcher to assign us one job
 
 
 def request_assign_job(job_id=-1):
@@ -38,11 +41,11 @@ def request_assign_job(job_id=-1):
     # Not being able to connect (Requests exception) or json decodification
     except Exception as e:
         logging.error("Exception: " + str(e))
-        return json.loads('{"status": "error", "status_msg": "connection_error"}')
+        return json.loads(
+            '{"status": "error", "status_msg": "connection_error"}'
+        )
 
 # Function used to push the results back
-
-
 def push_results(results):
     # logging.info ("Called push_results")
     # Set up the request
@@ -55,5 +58,5 @@ def push_results(results):
                           "/worker_save_results", data=payload)
         return r.status_code
     except Exception as e:
-        logging.error("Exception: " + str(e))
+        logging.error('Exception: %s', e)
         return 500

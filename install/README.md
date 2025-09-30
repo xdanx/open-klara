@@ -2,9 +2,9 @@
 
 ## Requirements for running Klara:
 
-- GNU/Linux (we recommend `Ubuntu 16.04` or latest LTS)
-- SQL DB Server: MySQL / MariaDB
-- Python 2.7
+- GNU/Linux (we recommend `Ubuntu 22.04.3` or latest LTS)
+- DB Server: MariaDB
+- Python 3.5+
 - Python virtualenv package
 - Yara (installed on workers)
 
@@ -73,7 +73,7 @@ mysql klara < db_schema.sql
 
 Install the packages needed to run Dispatcher:
 ```
-sudo apt -y install python-virtualenv libmysqlclient-dev python-dev git
+sudo apt -y install python3-venv git
 ```
 
 We recommend running dispatcher on a non-privileged user. Create an user which will be responsible to run Worker as well as Dispatcher:
@@ -99,7 +99,7 @@ su projects
 mkdir /var/projects/klara/ -p
 mkdir /var/projects/klara/logs/
 # Create the virtual-env
-virtualenv ~/.virtualenvs/klara
+python3 -m venv ~/.virtualenvs/klara
 ```
 
 Clone the repository:
@@ -113,7 +113,7 @@ Copy Dispatcher's files and install python dependencies:
 cp -R ~/klara-github-repo/dispatcher /var/projects/klara/dispatcher/
 cd /var/projects/klara/dispatcher/
 cp config-sample.py config.py
-source ~/klara-github-repo/install/activate.sh
+source ~/.virtualenvs/klara/bin/activate
 pip install -r ~/klara-github-repo/install/requirements.txt
 ```
 
@@ -143,7 +143,7 @@ notification_email_smtp_srv = "127.0.0.1"
 
 # MySQL / MariaDB settings for the Dispatcher to connect to the DB
 mysql_host      = "127.0.0.1"
-mysql_database  = "kl-klara"
+mysql_database  = "klara"
 mysql_user      = "root"
 mysql_password  = ""
 ```
@@ -151,10 +151,9 @@ Once settings are set, you can check Dispatcher is working by running the follow
 ```
 sudo su projects
 # We want to enable the virtualenv
-source  ~/klara-github-repo/install/activate.sh
+source  source ~/venvs/klara/bin/activate
 cd /var/projects/klara/dispatcher/
-chmod u+x ./klara-dispatcher
-./klara-dispatcher
+python3 ./klara-dispatcher
 ```
 If everything went well, you should see:
 ```
@@ -183,14 +182,14 @@ In order to insert a new API key to be used by a KLara worker, a new row needs t
 
 ```
 mysql > use klara;
-mysql > INSERT INTO projetcs value ("","description here", "API auth code here");
+mysql > INSERT INTO agents value ("", "KLara worker description here", "API auth code here");
 ```
 
 ## Installing the Worker agent
 
 Install the packages needed to run Worker:
 ```
-sudo apt -y install python-virtualenv libmysqlclient-dev python-dev git
+sudo apt -y install python3-venv git
 ```
 
 We recommend running Worker using a non-privileged user. Create an user which will be responsible to run Worker as well as Dispatcher:
@@ -216,7 +215,7 @@ su projects
 mkdir /var/projects/klara/ -p
 mkdir /var/projects/klara/logs/
 # Create the virtual-env
-virtualenv ~/.virtualenvs/klara
+python3 -m venv ~/.virtualenvs/klara
 ```
 
 Clone the repository:
@@ -230,7 +229,7 @@ Copy Worker's files to the newly created folder and install python dependencies:
 cp -R ~/klara-github-repo/worker /var/projects/klara/worker/
 cd /var/projects/klara/worker/
 cp config-sample.py config.py
-source ~/klara-github-repo/install/activate.sh
+source ~/.virtualenvs/klara/bin/activate
 pip install -r ~/klara-github-repo/install/requirements.txt
 ```
 
@@ -277,10 +276,9 @@ Once the settings are set, you can check Worker is working by running the follow
 ```
 sudo su projects
 # We want to enable the virtualenv
-source  ~/klara-github-repo/install/activate.sh
+source ~/.virtualenvs/klara/bin/activate
 cd /var/projects/klara/worker/
-chmod u+x ./klara-worker
-./klara-worker
+python3 ./klara-worker
 ```
 
 If everything went well, you should see:
@@ -299,7 +297,7 @@ sudo supervisorctl start klara_worker
 
 Install the required dependencies:
 ```
-sudo apt -y install libtool automake libjansson-dev libmagic-dev libssl-dev build-essential
+sudo apt -y install libtool automake libjansson-dev libmagic-dev libssl-dev build-essential pkg-config
 
 #
 # Get the latest stable version of yara from https://github.com/virustotal/yara/releases
@@ -377,12 +375,13 @@ Scan Repository control file also has some interesting modifiers that can be use
 
 Requirements for installing web interface are:
 
-- web server running at least PHP 5.6
-- the following php7 extensions:
+- web server running at least PHP 7.4
+- the following PHP extensions:
 
 ```
-apt install php7.0-fpm php7.0 php7.0-mysqli php7.0-curl php7.0-gd php7.0-intl php-pear php-imagick php7.0-imap php7.0-mcrypt php-memcache  php7.0-pspell php7.0-recode php7.0-sqlite3 php7.0-tidy php7.0-xmlrpc php7.0-xsl php7.0-mbstring php-gettext php-apcu
+apt install php php7.4-{fpm,mysqli,curl,gd,intl,pear,imagick,imap,memcache,pspell,sqlite3,tidy,xmlrpc,xsl,mbstring,apcu}
 ```
+Note: project not yet compatible with PHP8, so maybe https://tecadmin.net/how-to-install-php-on-debian-12/ helps.
 
 Once you have this installed, copy `/web/` folder to the HTTP server document root. Update and rename the following sample files:
 

@@ -31,7 +31,8 @@ def yara_scan(scan_options):
         yara_rules = scan_options['rules']
     if 'fileset_scan' not in scan_options:
         logging.warning("Did not receive 'fileset_scan' from dispatcher!")
-        results['yara_errors'] = "Did not receive 'fileset_scan' from dispatcher!"
+        results['yara_errors'] = \
+            "Did not receive 'fileset_scan' from dispatcher!"
         return results
     else:
         fileset_scan = scan_options['fileset_scan']
@@ -40,13 +41,16 @@ def yara_scan(scan_options):
     else:
         yara_timeout = scan_options['timeout']
 
-    null_file = open(os.devnull, 'rw')
+    null_file = open(os.devnull, 'w')
     yara_rules_save_error = False
     try:
         # Generate a temporary file name
-        yara_rules_temp_file = tempfile.NamedTemporaryFile(delete=False,
-                                                           prefix="yara_rules_",
-                                                           dir=config.yara_temp_dir)
+        yara_rules_temp_file = tempfile.NamedTemporaryFile(
+            mode="w",
+            delete=False,
+            prefix="yara_rules_",
+            dir=config.yara_temp_dir
+        )
         # Getting the 2 temp files' FN
         yara_rules_temp_file_fn = os.path.abspath(yara_rules_temp_file.name)
         # After we write the rules, we close the file so we prepare it for the
@@ -75,7 +79,8 @@ def yara_scan(scan_options):
 
     # Make sure the yara binary is executable
     if not os.path.isfile(config.yara_path):
-        results['yara_errors'] = "Yara binary missing from %s".format(config.yara_path)
+        results['yara_errors'] = "Yara binary missing from %s".format(
+            config.yara_path)
         # Close the files!
         null_file.close()
         # Deleting temp files
@@ -99,7 +104,7 @@ def yara_scan(scan_options):
 
     # If yara didn't return 0, then we have an error!
     if return_code != 0:
-        results['yara_errors'] = stderr_data
+        results['yara_errors'] = stderr_data.decode("utf-8")
         # Close the files!
         null_file.close()
         # Deleting temp files
@@ -109,21 +114,24 @@ def yara_scan(scan_options):
     # Return code was indeed 0, BUT there might be warnings returned by Yara.
     # We then save the stderr_data
     if len(stderr_data) != 0:
-        results['yara_warnings'] = stderr_data
+        results['yara_warnings'] = stderr_data.decode("utf-8")
 
     # Great, no errors!
     # 2) Doing the actual scan
-    yara_args = shlex.split(yara_cmd + str(fileset_scan))
+    yara_args = shlex.split(yara_cmd + '"' + str(fileset_scan) + '"')
     time_start = int(time.time())
     # We redirect stderr to null
     yara_process = subprocess.Popen(
         yara_args,                  stdout=subprocess.PIPE, stderr=null_file)
     head_process = subprocess.Popen(
-        config.head_path_and_args,  stdout=subprocess.PIPE, stdin=yara_process.stdout)
+        config.head_path_and_args,
+        stdout=subprocess.PIPE,
+        stdin=yara_process.stdout
+    )
     # Allow yara_process to receive a SIGPIPE if head_process exits.
     yara_process.stdout.close()
     # Now we wait for yara to finish....
-    (stdout_data, stderr_data) = head_process.communicate()
+    stdout_data = head_process.communicate()[0]
     time_end = int(time.time())
     # We want to run wait on yara in order to get its return code!
     yara_process.wait()
@@ -132,7 +140,8 @@ def yara_scan(scan_options):
     # Setting up the results dict
     results['finish_time'] = time.strftime('%Y-%m-%d %H:%M:%S')
     results['execution_time'] = time_end - time_start
-    results['yara_results'] = stdout_data
+    # We decode Yara's output to UTF8
+    results['yara_results'] = stdout_data.decode("utf-8")
     if return_code != 0:
         results['yara_errors'] = "Yara agent returned non-zero status code"
 
@@ -174,6 +183,8 @@ def generate_md5_from_results(yara_matched_files):
     # Prepare to run md5sum as Popen
     p = subprocess.Popen([config.md5sum_path] + yara_matched_files,
                          stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    (stdout_data, stderr_data) = p.communicate()
+    stdout_data = p.communicate()[0].decode('utf-8')
     # We want unique md5s
-    return json.dumps(list(set(re.findall(pattern_for_md5sum_results, stdout_data))))
+    return json.dumps(list(set(re.findall(
+        pattern_for_md5sum_results, stdout_data
+    ))))
