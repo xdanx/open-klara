@@ -188,7 +188,7 @@ class mysql():
 
         else:
             # If the current job doesn't exist any more, we just pass,
-            # loosing the results?!
+            # losing the results?!
             pass
 
         # Commit transaction!
