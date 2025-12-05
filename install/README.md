@@ -1,6 +1,8 @@
-# Installing Klara
+# Installing Open KLara
 
-## Requirements for running Klara:
+This guide covers the installation of **Open KLara**, a community-driven fork of the original Kaspersky Lab KLara project.
+
+## Requirements for running Open KLara:
 
 - GNU/Linux (we recommend `Ubuntu 22.04.3` or latest LTS)
 - DB Server: MariaDB
@@ -104,8 +106,8 @@ python3 -m venv ~/.virtualenvs/klara
 
 Clone the repository:
 
-```
-git clone https://github.com/KasperskyLab/klara.git ~/klara-github-repo
+```bash
+git clone https://github.com/xdanx/open-klara.git ~/klara-github-repo
 ```
 
 Copy Dispatcher's files and install python dependencies:
@@ -220,8 +222,8 @@ python3 -m venv ~/.virtualenvs/klara
 
 Clone the repository:
 
-```
-git clone https://github.com/KasperskyLab/klara.git ~/klara-github-repo
+```bash
+git clone https://github.com/xdanx/open-klara.git ~/klara-github-repo
 ```
 
 Copy Worker's files to the newly created folder and install python dependencies:
@@ -373,29 +375,170 @@ Scan Repository control file also has some interesting modifiers that can be use
 
 # Web interface installation
 
-Requirements for installing web interface are:
+The KLara web interface is a **PHP-based application** built with the **CodeIgniter framework**. It provides a modern web UI for submitting Yara scan jobs, viewing results, and managing users.
 
-- web server running at least PHP 7.4
-- the following PHP extensions:
+## Prerequisites
 
+Requirements for installing the web interface:
+
+- **Web server**: Apache 2.4+ or Nginx 1.18+
+- **PHP**: Version 7.4 (PHP 8 is not yet supported)
+- **Database**: MariaDB/MySQL (already configured in previous steps)
+- **Required PHP extensions**:
+
+```bash
+sudo apt install php php7.4-{fpm,mysqli,curl,gd,intl,pear,imagick,imap,memcache,pspell,sqlite3,tidy,xmlrpc,xsl,mbstring,apcu}
 ```
-apt install php php7.4-{fpm,mysqli,curl,gd,intl,pear,imagick,imap,memcache,pspell,sqlite3,tidy,xmlrpc,xsl,mbstring,apcu}
+
+**Note**: If you need to install PHP 7.4 on newer systems, refer to: https://tecadmin.net/how-to-install-php-on-debian-12/
+
+## Installation Steps
+
+### 1. Copy Web Files
+
+Copy the `/web/` folder from the cloned repository to your HTTP server document root:
+
+```bash
+# For Apache (default document root)
+sudo cp -R ~/klara-github-repo/web /var/www/html/klara
+
+# For Nginx (common document root)
+sudo cp -R ~/klara-github-repo/web /usr/share/nginx/html/klara
+
+# Set appropriate permissions
+sudo chown -R www-data:www-data /var/www/html/klara  # Apache
+# OR
+sudo chown -R www-data:www-data /usr/share/nginx/html/klara  # Nginx
 ```
-Note: project not yet compatible with PHP8, so maybe https://tecadmin.net/how-to-install-php-on-debian-12/ helps.
 
-Once you have this installed, copy `/web/` folder to the HTTP server document root. Update and rename the following sample files:
+### 2. Configure the Application
 
-- `application/config/config.sample.php` -> `application/config/config.php`
-- `application/config/database.sample.php` -> `application/config/database.php`
-- `application/config/project_settings.sample.php` -> `application/config/project_settings.php`
+Navigate to the web directory and rename the sample configuration files:
 
-You must configure the `base_url`, `encryption_key` from `config.php` as well as respective settings in `database.php` & `project_settings.php` .
-More info about this here:
+```bash
+cd /var/www/html/klara  # Adjust path as needed
 
+# Rename configuration files
+cp application/config/config.sample.php application/config/config.php
+cp application/config/database.sample.php application/config/database.php
+cp application/config/project_settings.sample.php application/config/project_settings.php
+```
+
+### 3. Update Configuration Files
+
+**a) Edit `application/config/config.php`:**
+
+```php
+// Set your base URL (important!)
+$config['base_url'] = 'http://your-server-ip/klara/';  // Adjust to your setup
+
+// Generate and set encryption key (required for sessions)
+// Generate a random 32-character key: openssl rand -hex 16
+$config['encryption_key'] = 'your-32-character-encryption-key-here';
+```
+
+**b) Edit `application/config/database.php`:**
+
+```php
+$db['default'] = array(
+    'hostname' => '127.0.0.1',
+    'username' => 'klara',
+    'password' => 'pass12345',  // Use the password you set during DB installation
+    'database' => 'klara',
+    'dbdriver' => 'mysqli',
+    // ... other settings remain as default
+);
+```
+
+**c) Edit `application/config/project_settings.php`:**
+
+Configure project-specific settings like email notifications, project title, etc.
+
+### 4. Web Server Configuration
+
+**For Apache:**
+
+Create a virtual host configuration file `/etc/apache2/sites-available/klara.conf`:
+
+```apache
+<VirtualHost *:80>
+    ServerName your-server-ip
+    DocumentRoot /var/www/html/klara
+
+    <Directory /var/www/html/klara>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/klara_error.log
+    CustomLog ${APACHE_LOG_DIR}/klara_access.log combined
+</VirtualHost>
+```
+
+Enable the site and required modules:
+
+```bash
+sudo a2enmod rewrite
+sudo a2ensite klara
+sudo systemctl restart apache2
+```
+
+**For Nginx:**
+
+Create a server block configuration file `/etc/nginx/sites-available/klara`:
+
+```nginx
+server {
+    listen 80;
+    server_name your-server-ip;
+    root /usr/share/nginx/html/klara;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+```
+
+Enable the site:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/klara /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+**Important**: For proper CodeIgniter routing, refer to:
+- https://www.nginx.com/resources/wiki/start/topics/recipes/codeigniter/
 - https://www.codeigniter.com/user_guide/installation/upgrade_303.html
 - https://codeigniter.com/user_guide/libraries/encryption.html
 - https://www.codeigniter.com/user_guide/database/configuration.html
-- https://www.nginx.com/resources/wiki/start/topics/recipes/codeigniter/ (The correct nginx configuration for codeigniter)
+
+## Accessing the Web Interface
+
+Once installation is complete, you can access the KLara web interface:
+
+### 1. Open Your Browser
+
+Navigate to one of the following URLs (depending on your configuration):
+
+- `http://your-server-ip/klara/` (if installed in a subdirectory)
+- `http://your-server-ip/klara/index.php` (explicit entry point)
+- `http://your-server-ip/` (if configured as the default site)
+
+### 2. Login with Default Credentials
 
 For your convenience, 2 `users`, 2 `groups` and 2 `scan repositories` have been created:
 
@@ -420,13 +563,57 @@ For your convenience, 2 `users`, 2 `groups` and 2 `scan repositories` have been 
 | /virus_repository |
 | /_clean           |
 
+### 3. Important Security Notes
+
+⚠️ **CRITICAL**: After your first login, you **MUST**:
+
+1. **Change all default passwords immediately**
+2. **Delete or disable unused default accounts**
+3. **Update the encryption key** in `config.php` to a secure random value
+4. **Configure HTTPS** for production environments (not covered in this guide)
+5. **Restrict database access** to only necessary hosts
+
+### 4. Troubleshooting Web Interface Issues
+
+**Problem: "404 Not Found" or blank page**
+- Verify web server is running: `sudo systemctl status apache2` or `sudo systemctl status nginx`
+- Check that `index.php` exists in the web root directory
+- Verify file permissions: `ls -la /var/www/html/klara/index.php`
+- Check web server error logs: `/var/log/apache2/error.log` or `/var/log/nginx/error.log`
+
+**Problem: "Database connection failed"**
+- Verify database credentials in `application/config/database.php`
+- Test database connection: `mysql -h 127.0.0.1 -u klara -p klara`
+- Ensure MariaDB/MySQL is running: `sudo systemctl status mariadb`
+
+**Problem: "The application environment is not set correctly"**
+- Check PHP version: `php -v` (must be 7.4)
+- Verify all required PHP extensions are installed: `php -m`
+- Check file permissions on the `application` directory
+
+**Problem: CodeIgniter routing not working (URLs like `/index.php/jobs` fail)**
+- For Apache: Ensure `mod_rewrite` is enabled and `.htaccess` is present
+- For Nginx: Verify the `try_files` directive in your server block configuration
+- Check the `base_url` setting in `application/config/config.php`
+
+**Problem: "There is no index.html file"**
+- This is **expected behavior**! KLara uses `index.php` (CodeIgniter framework), not static HTML files
+- The `index.html` files in subdirectories are security placeholders to prevent directory listing
+- Always access the application via `index.php` or through proper routing
 
 For more info about Web features (creating / deleting users, user quotas, groups, auth levels, etc..), please check dedicated page [Web Features](features_web.md)
 
 --------
 
-That's it! If you have any issues with installing this software, please submit a bug report, or join our [Telegram channel #KLara](https://t.me/kl_klara)
+## Getting Help
 
-Happy hunting!
+That's it! If you have any issues with installing this software:
+
+- **Submit a bug report**: [GitHub Issues](https://github.com/xdanx/open-klara/issues)
+- **Join our community**: [Telegram channel #open_klara](https://t.me/open_klara)
+- **Ask questions**: [GitHub Discussions](https://github.com/xdanx/open-klara/discussions)
+- **Contribute**: [Submit a Pull Request](https://github.com/xdanx/open-klara/pulls)
+
+Happy hunting! 🎯
 
 

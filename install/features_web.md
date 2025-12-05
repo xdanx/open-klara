@@ -1,9 +1,46 @@
-# Web features
+# Web Features
 
 KLara web is designed to be as modular as possible, allowing creating users in different groups, with different quotas, allowing sharing of scan results as well as searching through scan results.
 
+## Accessing the Web Interface
 
-## Scan repositories
+The KLara web interface is a **PHP-based application** built with the **CodeIgniter framework**. After completing the installation steps in [README.md](README.md#web-interface-installation), you can access it through your web browser.
+
+### URL Structure
+
+- **Main entry point**: `http://your-server-ip/klara/index.php`
+- **With URL rewriting**: `http://your-server-ip/klara/`
+- **Login page**: Automatically redirected if not authenticated
+
+### Understanding the Web Interface Structure
+
+**Important**: The web interface does **not** use static HTML files. Instead:
+
+- **Entry point**: `web/index.php` (PHP file, not HTML)
+- **Framework**: CodeIgniter (PHP MVC framework)
+- **Views**: Dynamic PHP templates in `web/application/views/`
+- **Controllers**: Application logic in `web/application/controllers/`
+- **Models**: Database interactions in `web/application/models/`
+
+The `index.html` files you may find in various subdirectories (e.g., `web/application/index.html`) are **security placeholders** that prevent directory listing. They are not the actual web interface.
+
+### Main Web Interface Pages
+
+After logging in, you'll have access to:
+
+- **Dashboard** (`/index.php/jobs`): View all submitted Yara scan jobs
+- **Submit New Job** (`/index.php/jobs/add`): Create new Yara scan jobs
+- **Job Details** (`/index.php/jobs/view/[job_id]`): View results of completed scans
+- **Advanced Search** (`/index.php/jobs/advanced_search`): Search for MD5 hashes across jobs (admin only)
+- **Admin Tools** (`/index.php/admin_tools`): User management utilities (admin only)
+
+### Default Login Credentials
+
+See [README.md](README.md#accessing-the-web-interface) for default usernames and passwords.
+
+⚠️ **Security Warning**: Change all default passwords immediately after first login!
+
+## Scan Repositories
 
 List of scan repositories is located in DB table `scan_filesets`. This table defines the list of virus repositories users see when they try to start a new job (while accessing page `index.php/jobs/add`). This list needs to include **all** scan repositories that exist on all workers,  else users will not be able to submit scan jobs for specific scan repositories located in Workers' `virus_collection`, with missing entries in `scan_filesets` table.
 
@@ -47,14 +84,14 @@ Method available for authenticated admins at `http://[klara-ip]/index.php/admin_
 
 This prints a randomly generated password accompanied by its BCRYPT hash. Useful when creating one user: insert the bcrypt hash into DB and send the plaintext to the user.
 
-Password's complexity can be changed by modifying the parameters for function `generate_password`. Check the source code for [`KLsecurity` model](https://github.com/KasperskyLab/klara/blob/master/web/application/models/Klsecurity.php)
+Password's complexity can be changed by modifying the parameters for function `generate_password`. Check the source code for [`KLsecurity` model](https://github.com/xdanx/open-klara/blob/master/web/application/models/Klsecurity.php)
 
 
 * `generate_users`
 
 Method available for authenticated admins at `http://[klara-ip]/index.php/admin_tools/generate_users`
 
-This method takes the `$users_emails` array and automatically generates username + password pairs, as well as the SQL statements, ready to be inserted into table `users`. The array can be found at [`Admin_tools.php`](https://github.com/KasperskyLab/klara/blob/master/web/application/controllers/Admin_tools.php#L43)
+This method takes the `$users_emails` array and automatically generates username + password pairs, as well as the SQL statements, ready to be inserted into table `users`. The array can be found at [`Admin_tools.php`](https://github.com/xdanx/open-klara/blob/master/web/application/controllers/Admin_tools.php#L43)
 
 The `$users_emails` should be a PHP array, containing a list of usernames you want to create accounts for. Example:
 
