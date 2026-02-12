@@ -18,7 +18,7 @@ For full installation instructions, see the [Installation Guide](docs/how-to/ins
 
 ## Documentation
 
-Full documentation lives in [`docs/`](docs/index.md), organized by the [Diátaxis framework](https://diataxis.fr/):
+Full documentation lives in [`docs/`](docs/README.md), organized by the [Diátaxis framework](https://diataxis.fr/):
 
 | Section | Description |
 |---------|-------------|
@@ -37,8 +37,8 @@ Contributions are welcome! Please open a PR or file an issue on [GitHub](https:/
 
 ## Credits
 
-- **Original KLara**: [Kaspersky Lab's GReAT Team](https://github.com/KasperskyLab/klara) — Costin, Marco, Vitaly, Sergey, Alex@grep
 - **Open KLara**: [xdanx](https://github.com/xdanx) (maintainer), [gajeshbhat](https://github.com/gajeshbhat) (maintainer)
+- **Original KLara**: [Kaspersky Lab's GReAT Team](https://github.com/KasperskyLab/klara) — Costin, Marco, Vitaly, Sergey, Alex@grep
 - **Yara**: [VirusTotal](https://github.com/VirusTotal/yara)
 
 ## License
