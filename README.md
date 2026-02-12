@@ -38,7 +38,7 @@ Contributions are welcome! Please open a PR or file an issue on [GitHub](https:/
 ## Credits
 
 - **Original KLara**: [Kaspersky Lab's GReAT Team](https://github.com/KasperskyLab/klara) — Costin, Marco, Vitaly, Sergey, Alex@grep
-- **Open KLara**: [xdanx](https://github.com/xdanx) (maintainer), [gajeshbhat](https://github.com/gajeshbhat) (co-maintainer)
+- **Open KLara**: [xdanx](https://github.com/xdanx) (maintainer), [gajeshbhat](https://github.com/gajeshbhat) (maintainer)
 - **Yara**: [VirusTotal](https://github.com/VirusTotal/yara)
 
 ## License
