@@ -14,7 +14,7 @@ Thank you for your interest in contributing to Open KLara! This document provide
    ```bash
    git checkout -b my-feature
    ```
-4. Follow the [installation guide](docs/tutorials/installation.md) to set up a development environment.
+4. Follow the [installation guide](docs/how-to/installation.md) to set up a development environment.
 
 ## How to Contribute
 
