@@ -162,7 +162,7 @@ If everything went well, you should see:
 [01/01/1977 13:37:00 AM][INFO]  ###### Starting KLara Job Dispatcher ######
 ```
 
-In order to start Dispatcher automatically at boot, please check [Supervisor installation](supervisor.md)
+In order to start Dispatcher automatically at boot, please check [Process Management](../docs/how-to/process-management.md)
 
 Next step would be starting Dispatcher using `supervisorctl`:
 ```
@@ -288,7 +288,7 @@ If everything went well, you should see:
 [01/01/1977 13:37:00 AM][INFO]  ###### Starting KLara Worker ######
 ```
 
-In order to start Worker automatically at boot, please check [Supervisor installation](supervisor.md)
+In order to start Worker automatically at boot, please check [Process Management](../docs/how-to/process-management.md)
 
 Next step would be starting Worker using `supervisorctl`:
 ```
@@ -355,7 +355,7 @@ It is entirely up to you how to organize your scan repositories. An example of o
 
 ## Filesystem optimisation
 
-Running Klara (or Yara) on a fast enough machine is very important for stability and getting back results fast enough. Please check some tips and tricks for [filesystem optimisations](features_fs_optimisations.md)
+Running Klara (or Yara) on a fast enough machine is very important for stability and getting back results fast enough. Please check some tips and tricks for [filesystem optimisations](../docs/explanation/performance.md)
 
 ## Repository control
 
@@ -371,7 +371,7 @@ Optionally, just for usability, you should write some info about the repository:
 {"owner": "John Doe", "files_type": "elf", "repository_type": "APT"}
 ```
 
-Scan Repository control file also has some interesting modifiers that can be used to manipulate Yara scans or results. For further info, please check [Advanced usage](features_advanced.md)
+Scan Repository control file also has some interesting modifiers that can be used to manipulate Yara scans or results. For further info, please check [Advanced usage](../docs/how-to/advanced-usage.md)
 
 # Web interface installation
 
@@ -601,7 +601,7 @@ For your convenience, 2 `users`, 2 `groups` and 2 `scan repositories` have been 
 - The `index.html` files in subdirectories are security placeholders to prevent directory listing
 - Always access the application via `index.php` or through proper routing
 
-For more info about Web features (creating / deleting users, user quotas, groups, auth levels, etc..), please check dedicated page [Web Features](features_web.md)
+For more info about Web features (creating / deleting users, user quotas, groups, auth levels, etc..), please check dedicated page [Web Interface Reference](../docs/reference/web-interface.md)
 
 --------
 

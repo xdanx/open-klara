@@ -14,7 +14,7 @@ over collections with samples, getting notifications by e-mail as well as the we
 
 # Features
 
-- Modern web interface, allowing researchers to "fire and forget" their rules, getting back results by [e-mail / API](/install/features_web.md)
+- Modern web interface, allowing researchers to "fire and forget" their rules, getting back results by [e-mail / API](/docs/reference/web-interface.md)
 - Powerful API, allowing for automatic Yara jobs submissions, checking their status and getting back results. API Documentation will be released soon.
 - Distributed system, running on commodity hardware, easy to deploy and implement.
 
