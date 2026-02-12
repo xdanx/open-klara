@@ -1,9 +1,20 @@
 ### Your checklist for this pull request
 
-- [ ] Make sure you are making a pull request against the **devel branch** (left side). Also you should start *your branch* off *our devel*.
-- [ ] Check the commit's or even all commits' message styles matches our requested structure.
+- [ ] Make sure you are making a pull request against the **master** branch.
+- [ ] Check that commit messages are clear and descriptive.
+- [ ] Confirm that your changes do not break existing functionality.
+- [ ] Update documentation if applicable.
 
 ### Description
+
 Please describe your pull request.
 
-💔Thank you!
+### Motivation and context
+
+Why is this change needed? What problem does it solve?
+
+### How has this been tested?
+
+Describe the tests you ran to verify your changes.
+
+💚 Thank you!
